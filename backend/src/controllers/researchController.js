@@ -9,7 +9,7 @@ exports.handleQuery = async (req, res, next) => {
     try {
         const { query } = req.body
 
-        const result = processQuery(query)
+        const result = await processQuery(query)
 
         res.json(result)
 

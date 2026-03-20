@@ -1,5 +1,5 @@
 {
-  "name": "repoInsights-backend",
+  "name": "repoinsights-backend",
   "version": "1.0.0",
   "description": "",
   "keywords": [],
@@ -16,6 +16,8 @@
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
-    "express-validator": "^7.3.1"
-  }
+    "express-validator": "^7.3.1",
+    "mongoose": "^9.3.1"
+  },
+  "devDependencies": {}
 }
