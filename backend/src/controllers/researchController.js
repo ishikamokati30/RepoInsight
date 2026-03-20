@@ -5,10 +5,15 @@
 // }
 const { processQuery } = require("../services/researchService")
 
-exports.handleQuery = (req, res) => {
-    const { query } = req.body
+exports.handleQuery = async (req, res, next) => {
+    try {
+        const { query } = req.body
 
-    const result = processQuery(query)
+        const result = processQuery(query)
 
-    res.json(result)
+        res.json(result)
+
+    } catch (error) {
+        next(error)
+    }
 }
