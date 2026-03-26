@@ -27,3 +27,25 @@ def home():
 def get_embedding(text: str):
     embedding = model.encode(text).tolist()
     return {"embedding": embedding}
+
+@app.post("/search-from-db")
+def search_from_db(data: dict):
+    query = data["query"]
+    db_embeddings = data["embeddings"]
+    db_texts = data["texts"]
+
+    if not db_embeddings:
+        return {"results": []}
+
+    import numpy as np
+    import faiss
+
+    query_vec = model.encode(query)
+
+    index = faiss.IndexFlatL2(len(query_vec))
+    index.add(np.array(db_embeddings))
+
+    D, I = index.search(np.array([query_vec]), k=3)
+
+    results = [db_texts[i] for i in I[0]]
+    return {"results": results}
