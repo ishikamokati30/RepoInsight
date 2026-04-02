@@ -1,51 +1,56 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-from app.search import add_document, search
+import numpy as np
+import faiss
 from sentence_transformers import SentenceTransformer
 
 app = FastAPI()
 
 model = SentenceTransformer('all-MiniLM-L6-v2')
+
 class TextInput(BaseModel):
     text: str
 
-@app.post("/add")
-def add_doc(input: TextInput):
-    add_document(input.text)
-    return {"message": "Document added"}
+class SearchInput(BaseModel):
+    query: str
+    texts: list
+    embeddings: list
 
-@app.post("/search")
-def search_docs(input: TextInput):
-    results = search(input.text)
-    return {"results": results}
 
 @app.get("/")
 def home():
     return {"message": "ML Service Running"}
 
 @app.post("/embed")
-def get_embedding(text: str):
-    embedding = model.encode(text).tolist()
+def get_embedding(input: TextInput):
+    embedding = model.encode(input.text).tolist()
     return {"embedding": embedding}
 
 @app.post("/search-from-db")
-def search_from_db(data: dict):
-    query = data["query"]
-    db_embeddings = data["embeddings"]
-    db_texts = data["texts"]
+def search_from_db(data: SearchInput):
 
-    if not db_embeddings:
+    # ✅ Check empty embeddings
+    if not data.embeddings or len(data.embeddings) == 0:
         return {"results": []}
 
-    import numpy as np
-    import faiss
+    try:
+        db_embeddings = np.array(data.embeddings).astype('float32')
+    except:
+        return {"results": []}
 
-    query_vec = model.encode(query)
+    # ✅ Encode query
+    query_vec = model.encode(data.query).astype('float32')
 
-    index = faiss.IndexFlatL2(len(query_vec))
-    index.add(np.array(db_embeddings))
+    # ✅ Create FAISS index
+    dim = db_embeddings.shape[1]
+    index = faiss.IndexFlatL2(dim)
 
+    index.add(db_embeddings)
+
+    # ✅ Search
     D, I = index.search(np.array([query_vec]), k=3)
 
-    results = [db_texts[i] for i in I[0]]
+    # ✅ Map results
+    results = [data.texts[i] for i in I[0]]
+
     return {"results": results}
