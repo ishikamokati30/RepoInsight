@@ -27,7 +27,7 @@ exports.searchQuery = async (req, res, next) => {
 
         const validData = allData.filter(item => item.embedding && item.embedding.length > 0)
 
-const texts = validData.map(item => item.query)
+const texts = [...new Set(validData.map(item => item.query))]
 const embeddings = validData.map(item => item.embedding)
 
 console.log("Texts:", texts.length)
@@ -51,5 +51,16 @@ if (embeddings.length === 0) {
     } catch (error) {
         console.error(error.message)
         next(error)
+    }
+}
+const { askAI } = require("../services/researchService")
+
+exports.askQuestion = async (req, res, next) => {
+    try {
+        const { query } = req.body
+        const result = await askAI(query)
+        res.json(result)
+    } catch (err) {
+        next(err)
     }
 }
