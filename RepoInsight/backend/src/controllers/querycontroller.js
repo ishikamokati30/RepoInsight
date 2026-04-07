@@ -1,12 +1,16 @@
 import { queryAI } from "../services/aiservice.js";
+import { saveQuery } from "../db/queries.js";
 
 export const handleQuery = async (req, res) => {
   try {
-    const { message, mode } = req.body;
+    const { message, mode, userId = 1 } = req.body;
 
-    const response = await queryAI({ message, mode });
+    const aiResponse = await queryAI({ message, mode });
 
-    res.json(response);
+    // Save in DB
+    await saveQuery(userId, message, aiResponse.answer);
+
+    res.json(aiResponse);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
