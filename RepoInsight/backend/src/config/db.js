@@ -1,11 +1,10 @@
-const { Pool } = require("pg");
+import "../config/env.js";
+import pkg from "pg";
+
+const { Pool } = pkg;
 
 const pool = new Pool({
-  user: "postgres",
-  host: "localhost",
-  database: "repoinsight",
-  password: "ayu5hika",
-  port: 5432,
+  connectionString: process.env.DATABASE_URL,
 });
 
-module.exports = pool;
+export default pool;

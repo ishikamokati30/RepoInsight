@@ -3,24 +3,24 @@ from app.agents.retriever_agent import retrieve_context
 from app.agents.reasoning_agent import build_prompt
 from app.agents.quiz_agent import generate_quiz
 from app.utils.llm import generate_response
-
+from app.agents.evaluation_agent import evaluate_answer
 
 def run_flow(message, mode):
     intent = detect_intent(message)
+    context_data = retrieve_context(message)
 
-    context = retrieve_context(message)
-
-    prompt = build_prompt(message, context)
+    context_text = "\n".join([c["text"] for c in context_data])
+    prompt = build_prompt(message, context_text)
 
     answer = generate_response(prompt)
 
     response = {
         "answer": answer,
-        "intent": intent,
-        "context_used": context
+        "sources": context_data
     }
 
     if mode == "learning":
-        response["quiz"] = generate_quiz(message)
+        quiz = generate_quiz(message)
+        response["quiz"] = quiz
 
     return response

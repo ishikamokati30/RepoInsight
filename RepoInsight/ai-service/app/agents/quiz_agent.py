@@ -1,8 +1,23 @@
 from app.utils.llm import generate_response
+import json
 
 def generate_quiz(topic):
     prompt = f"""
-    Create 3 MCQs on: {topic}
-    Provide options and correct answer.
+    Generate 3 MCQs on: {topic}
+
+    Return in JSON format:
+    [
+      {{
+        "question": "...",
+        "options": ["A","B","C","D"],
+        "answer": "correct option"
+      }}
+    ]
     """
-    return generate_response(prompt)
+
+    res = generate_response(prompt)
+
+    try:
+        return json.loads(res)
+    except:
+        return {"raw": res}

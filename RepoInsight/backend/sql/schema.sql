@@ -17,3 +17,14 @@ CREATE TABLE progress (
   topic TEXT,
   score INT
 );
+
+CREATE TABLE quiz_results (
+  id SERIAL PRIMARY KEY,
+  user_id INT,
+  topic TEXT,
+  question TEXT,
+  user_answer TEXT,
+  correct_answer TEXT,
+  is_correct BOOLEAN,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
