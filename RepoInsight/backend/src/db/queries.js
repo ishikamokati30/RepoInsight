@@ -21,3 +21,27 @@ export const getUserProgress = async (userId) => {
   );
   return result.rows;
 };
+
+export const saveQuizResult = async (
+  userId,
+  topic,
+  question,
+  userAnswer,
+  correctAnswer,
+  isCorrect
+) => {
+  const query = `
+    INSERT INTO quiz_results 
+    (user_id, topic, question, user_answer, correct_answer, is_correct)
+    VALUES ($1, $2, $3, $4, $5, $6)
+  `;
+
+  await pool.query(query, [
+    userId,
+    topic,
+    question,
+    userAnswer,
+    correctAnswer,
+    isCorrect,
+  ]);
+};
