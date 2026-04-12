@@ -13,15 +13,6 @@ export const saveQuery = async (userId, message, response) => {
   return result.rows[0];
 };
 
-// Get progress
-export const getUserProgress = async (userId) => {
-  const result = await pool.query(
-    "SELECT * FROM progress WHERE user_id = $1",
-    [userId]
-  );
-  return result.rows;
-};
-
 export const saveQuizResult = async (
   userId,
   topic,
@@ -44,4 +35,34 @@ export const saveQuizResult = async (
     correctAnswer,
     isCorrect,
   ]);
+};
+export const getUserProgress = async (userId) => {
+  const result = await pool.query(
+    `
+    SELECT 
+      COUNT(*) AS total,
+      SUM(CASE WHEN is_correct THEN 1 ELSE 0 END) AS correct
+    FROM quiz_results
+    WHERE user_id = $1
+    `,
+    [userId]
+  );
+
+  return result.rows[0];
+};
+
+export const getWeakTopics = async (userId) => {
+  const result = await pool.query(
+    `
+    SELECT topic,
+           COUNT(*) AS total,
+           SUM(CASE WHEN is_correct THEN 1 ELSE 0 END) AS correct
+    FROM quiz_results
+    WHERE user_id = $1
+    GROUP BY topic
+    `,
+    [userId]
+  );
+
+  return result.rows;
 };

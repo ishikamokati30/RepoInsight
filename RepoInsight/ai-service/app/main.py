@@ -1,4 +1,5 @@
 from dotenv import load_dotenv
+import logging
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
@@ -13,6 +14,13 @@ from app.rag.ingest import ingest_pdf, ingest_text
 from app.utils.llm import LLMConfigurationError, LLMError, LLMRateLimitError
 
 load_dotenv()
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 

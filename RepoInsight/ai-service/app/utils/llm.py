@@ -10,7 +10,7 @@ from google.api_core.exceptions import GoogleAPICallError, ResourceExhausted
 load_dotenv()
 
 MODEL_NAME = "gemini-2.5-flash"
-MAX_RETRIES = 1
+MAX_RETRIES = 2
 RETRY_DELAY_SECONDS = 30
 
 
@@ -76,8 +76,13 @@ def _get_client() -> genai.Client:
     return genai.Client(api_key=api_key)
 
 
-def generate_response(prompt: str) -> str:
-    """Generate text with Gemini and translate provider errors into app errors."""
+def generate_response(prompt: str, response_mime_type: str = "text/plain") -> str:
+    """Generate text with Gemini and translate provider errors into app errors.
+    
+    Args:
+        prompt: The prompt to send to Gemini
+        response_mime_type: MIME type for response format (text/plain, application/json, etc.)
+    """
     if not prompt.strip():
         raise LLMServiceError(
             "Prompt cannot be empty.",
@@ -92,6 +97,9 @@ def generate_response(prompt: str) -> str:
             response = client.models.generate_content(
                 model=MODEL_NAME,
                 contents=prompt,
+                config={
+                    "response_mime_type": response_mime_type
+                }
             )
             text = (response.text or "").strip()
             if not text:

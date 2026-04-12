@@ -4,7 +4,6 @@ import axios from "axios";
 const router = express.Router();
 const AI_SERVICE_URL = process.env.AI_SERVICE_URL || "http://localhost:8000";
 
-// Text ingestion
 router.post("/text", async (req, res) => {
   try {
     const response = await axios.post(`${AI_SERVICE_URL}/ingest/text`, req.body);
